@@ -35,8 +35,36 @@ const NOTES = {
   faq: "Preguntas frecuentes (q = pregunta, a = respuesta)",
   heroPoses: "Poses que rotan en la portada (archivos de /images, sin .webp)",
   heroSays: "Frases del globo de diálogo de Lyra",
-  gallery: "Galería: [archivo, epígrafe]"
+  gallery: "Galería: [archivo, epígrafe]",
+  hidden: "Partes de la página ocultas (lo maneja el editor; borrá un nombre de la lista para volver a mostrarla)"
 };
+
+/* ---------- Partes de la página que se pueden ocultar ---------- */
+// [clave, nombre para mostrar, texto que identifica esa parte dentro de index.html]
+// Las claves tienen que coincidir con las de HIDEABLE en js/main.js
+const BTN = /id="(heroBtns|bottomBtns)"/;
+const PARTS = [
+  ["ticker",      "Cinta de texto que se mueve",             /class="ticker"/],
+  ["bubble",      "Globo de diálogo de Lyra",                /id="bubble"/],
+  ["hint",        "Texto “tocá a Lyra”",                     /class="hint"/],
+  ["count",       "Cuenta regresiva",                        /id="count"/],
+  ["btnEntradas", "Botón Entradas",                          BTN],
+  ["btnWhatsapp", "Botón Grupo de WhatsApp",                 BTN],
+  ["btnInstagram","Botón Instagram",                         BTN],
+  ["info",        "Sección Info",                            /id="info"/],
+  ["lineup",      "Sección Line-up",                         /id="lineup"/],
+  ["barra",       "Sección La barra",                        /id="barra"/],
+  ["gallery",     "Sección Conocé a Lyra (galería)",         /id="lyra"/],
+  ["faq",         "Sección FAQ",                             /id="faq"/],
+  ["join",        "Sección Sumate (botones del final)",      /class="join"/],
+  ["footer",      "Pie de página (Lyra dormida + Instagram)", /<footer/]
+];
+
+// Devuelve solo las partes que existen en tu index.html (si ya borraste una a mano, no aparece)
+function availableParts() {
+  const html = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
+  return PARTS.filter(([, , re]) => re.test(html)).map(([key, label]) => ({ key, label }));
+}
 
 // Formatea un valor: las listas van una línea por elemento
 function fmt(v) {
@@ -73,9 +101,10 @@ function validate(cfg) {
   for (const k of ["tagline", "sub", "date"]) {
     if (typeof cfg[k] !== "string") throw new Error(`El campo ${k} debe ser texto`);
   }
-  for (const k of ["info", "faq", "lineup", "barra", "heroPoses", "heroSays", "gallery"]) {
+  for (const k of ["info", "faq", "lineup", "barra", "heroPoses", "heroSays", "gallery", "hidden"]) {
     if (k in cfg && !Array.isArray(cfg[k])) throw new Error(`El campo ${k} debe ser una lista`);
   }
+  if (cfg.hidden && !cfg.hidden.every(x => typeof x === "string")) throw new Error("hidden debe ser una lista de textos");
 }
 
 /* ---------- Git ---------- */
@@ -97,7 +126,7 @@ async function publish(overwrite = false) {
 
   if (!diff.ok) {
     const stamp = new Date().toLocaleString("es-AR");
-    // "-- js/config.js": commitea SOLO este archivo, aunque haya otros cosas preparadas
+    // "-- js/config.js": commitea SOLO este archivo, aunque haya otras cosas preparadas
     const commit = await git("commit", "-m", `Actualiza info de la fiesta (${stamp})`, "--", "js/config.js");
     if (!commit.ok) return { ok: false, msg: "No se pudo hacer el commit:\n" + commit.out +
       "\n\nSi dice 'Please tell me who you are', corré una vez:\n  git config --global user.name \"Tu nombre\"\n  git config --global user.email \"tu@mail.com\"" };
@@ -156,7 +185,7 @@ const server = http.createServer(async (req, res) => {
     const url = new URL(req.url, "http://localhost");
 
     // --- API ---
-    if (url.pathname === "/api/config" && req.method === "GET") return send(res, 200, readConfig());
+    if (url.pathname === "/api/config" && req.method === "GET") return send(res, 200, { cfg: readConfig(), parts: availableParts() });
 
     if (url.pathname === "/api/save" && req.method === "POST") {
       const cfg = JSON.parse(await readBody(req));

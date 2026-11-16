@@ -35,6 +35,12 @@
     .save { background: var(--green); color: var(--ink); }
     .pub { background: var(--pink); color: #fff; }
     .view { color: var(--cyan); font-weight: 700; margin-left: auto; }
+    /* ---- Casillas de mostrar/ocultar y miniaturas de la galería ---- */
+    .checks { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 8px; }
+    label.chk { display: flex; align-items: center; gap: 10px; background: #1b1440; padding: 9px 12px; border-radius: 12px; cursor: pointer; }
+    label.chk input { width: 20px; height: 20px; flex: none; accent-color: var(--pink); }
+    p.note { color: var(--muted); font-size: .85rem; margin: 0 0 10px; }
+    img.thumb { height: 46px; width: auto; flex: none; }
     #status { white-space: pre-wrap; margin-top: 8px; font-size: .9rem; max-width: 760px; margin-inline: auto; }
     #status.ok { color: #7dff7d; } #status.err { color: #ff8da1; }
   </style>
@@ -58,7 +64,8 @@
 </div>
 
 <script>
-let cfg;   // acá vive toda la info mientras editás
+let cfg;          // acá vive toda la info mientras editás
+let parts = [];   // partes de la página que se pueden ocultar (las manda el servidor)
 
 /* ---------- Helper para crear elementos sin riesgo de romper con comillas ---------- */
 function h(tag, props = {}, ...kids) {
@@ -121,6 +128,38 @@ function strList(arr, ph) {
   return box;
 }
 
+/* ---------- Galería de stickers: cambiar epígrafe o quitar ---------- */
+function galList(arr) {
+  const box = h("div");
+  const draw = () => box.replaceChildren(...arr.map((it, i) => {
+    const inp = h("input", { class: "mid", placeholder: "Epígrafe" });
+    inp.value = it[1] || "";
+    inp.oninput = () => it[1] = inp.value;
+    return h("div", { class: "row" },
+      h("img", { class: "thumb", src: "/images/" + it[0] + ".webp", alt: it[0] }), inp,
+      h("button", { class: "x", title: "Quitar de la galería", onclick: () => { arr.splice(i, 1); draw(); } }, "✕"));
+  }));
+  draw();
+  return box;
+}
+
+/* ---------- Casillas: mostrar / ocultar partes de la página ---------- */
+// Tildado = se ve. Destildado = se oculta (se guarda en cfg.hidden)
+function visibility() {
+  cfg.hidden = cfg.hidden || [];
+  return h("section", {}, h("h2", {}, "Mostrar u ocultar partes de la página"),
+    h("p", { class: "note" }, "Destildá lo que no quieras que aparezca. Podés volver a tildarlo cuando quieras."),
+    h("div", { class: "checks" }, ...parts.map(({ key, label }) => {
+      const c = h("input", { type: "checkbox" });
+      c.checked = !cfg.hidden.includes(key);
+      c.onchange = () => {
+        cfg.hidden = cfg.hidden.filter(k => k !== key);
+        if (!c.checked) cfg.hidden.push(key);
+      };
+      return h("label", { class: "chk" }, c, label);
+    })));
+}
+
 /* ---------- Arma toda la pantalla ---------- */
 function render() {
   // Aseguramos que existan las listas
@@ -132,6 +171,21 @@ function render() {
   dt.value = (cfg.date || "").slice(0, 16);
   dt.oninput = () => cfg.date = dt.value ? dt.value + ":00-03:00" : "";
   const clear = h("button", { class: "clear", onclick: () => { dt.value = ""; cfg.date = ""; } }, "Borrar fecha (mostrar “próximamente”)");
+
+  // "Más opciones": solo muestra lo que existe en tu index.html
+  const has = k => parts.some(p => p.key === k);
+  cfg.gallery = cfg.gallery || [];
+  const more = [];
+  if (has("lineup")) more.push(
+    h("h2", { style: "margin-top:12px" }, "Line-up"), strList(cfg.lineup, "Artista / DJ"));
+  if (has("barra")) more.push(
+    h("h2", { style: "margin-top:14px" }, "La barra"),
+    objList(cfg.barra, [["ic", "😀", "emoji"], ["t", "Título", "mid"], ["p", "Texto", "mid"]], { ic: "🍹", t: "", p: "" }));
+  if (has("gallery")) more.push(
+    h("h2", { style: "margin-top:14px" }, "Galería de stickers"),
+    h("p", { class: "note" }, "Quitar un sticker lo saca de la galería (el archivo de la imagen sigue en la carpeta)."),
+    galList(cfg.gallery));
+  more.push(h("h2", { style: "margin-top:14px" }, "Frases del globo de Lyra"), strList(cfg.heroSays, "Frase"));
 
   const app = document.getElementById("app");
   app.replaceChildren(
@@ -145,20 +199,14 @@ function render() {
       text("💬 Grupo de WhatsApp", cfg.links, "whatsapp", "https://chat.whatsapp.com/..."),
       text("📸 Instagram", cfg.links, "instagram", "https://instagram.com/...")
     ),
+    visibility(),
     h("section", {}, h("h2", {}, "Info (lugar, horario, edad…)"),
       objList(cfg.info, [["ic", "😀", "emoji"], ["t", "Título", "mid"], ["p", "Texto", "mid"]], { ic: "✨", t: "", p: "" })
     ),
     h("section", {}, h("h2", {}, "Preguntas frecuentes"),
       objList(cfg.faq, [["q", "Pregunta"], ["a", "Respuesta"]], { q: "", a: "" }, true)
     ),
-    h("details", {}, h("summary", {}, "Más opciones"),
-      h("h2", { style: "margin-top:12px" }, "Line-up (solo se ve si la sección existe en el HTML)"),
-      strList(cfg.lineup, "Artista / DJ"),
-      h("h2", { style: "margin-top:14px" }, "La barra (solo se ve si la sección existe en el HTML)"),
-      objList(cfg.barra, [["ic", "😀", "emoji"], ["t", "Título", "mid"], ["p", "Texto", "mid"]], { ic: "🍹", t: "", p: "" }),
-      h("h2", { style: "margin-top:14px" }, "Frases del globo de Lyra"),
-      strList(cfg.heroSays, "Frase")
-    )
+    h("details", {}, h("summary", {}, "Más opciones"), ...more)
   );
 }
 
@@ -187,7 +235,7 @@ btnForce.onclick = () => {
 };
 
 /* ---------- Arranque ---------- */
-fetch("/api/config").then(r => r.json()).then(c => { cfg = c; render(); })
+fetch("/api/config").then(r => r.json()).then(d => { cfg = d.cfg; parts = d.parts; render(); })
   .catch(() => document.getElementById("app").textContent = "No se pudo leer js/config.js");
 </script>
 </body>

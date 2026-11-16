@@ -6,6 +6,8 @@
 const $ = id => document.getElementById(id);
 // Ruta de una imagen de Lyra a partir de su nombre
 const img = name => `images/${name}.webp`;
+// Partes ocultas desde el editor (lista de claves en CONFIG.hidden)
+const hidden = new Set(CONFIG.hidden || []);
 
 /* ---------- Textos simples ---------- */
 $("tagline").textContent = CONFIG.tagline;
@@ -35,13 +37,16 @@ function makeBtn(label, href, cls) {
   if (href) { a.href = href; a.target = "_blank"; a.rel = "noopener"; }
   return a;
 }
-// Se ponen los mismos botones arriba y abajo de la página
+// [clave para ocultar, texto, link, estilo]
+const BUTTONS = [
+  ["btnEntradas",  "🎟️ Entradas",         CONFIG.links.entradas,   ""],
+  ["btnWhatsapp",  "💬 Grupo de WhatsApp", CONFIG.links.whatsapp,   "alt"],
+  ["btnInstagram", "📸 Instagram",         CONFIG.links.instagram,  "alt2"]
+];
+// Se ponen los mismos botones arriba y abajo (saltea los que ocultaste)
 ["heroBtns", "bottomBtns"].forEach(id => {
-  $(id).append(
-    makeBtn("🎟️ Entradas", CONFIG.links.entradas, ""),
-    makeBtn("💬 Grupo de WhatsApp", CONFIG.links.whatsapp, "alt"),
-    makeBtn("📸 Instagram", CONFIG.links.instagram, "alt2")
-  );
+  if (!$(id)) return;
+  $(id).append(...BUTTONS.filter(([key]) => !hidden.has(key)).map(([, label, href, cls]) => makeBtn(label, href, cls)));
 });
 
 /* ---------- Tarjetas (Info y Barra) ---------- */
@@ -57,7 +62,15 @@ function renderCards(list, boxId) {
   });
 }
 renderCards(CONFIG.info, "infoGrid");
-renderCards(CONFIG.barra, "barGrid");   // si borraste la sección "La barra", simplemente no hace nada
+renderCards(CONFIG.barra || [], "barGrid");   // si borraste la sección "La barra", no hace nada
+
+/* ---------- Line-up (solo si la sección existe en el HTML) ---------- */
+if ($("lineupList")) {
+  (CONFIG.lineup || []).forEach(name => {
+    const s = document.createElement("span"); s.className = "pill"; s.textContent = name;
+    $("lineupList").appendChild(s);
+  });
+}
 
 /* ---------- Preguntas frecuentes (desplegables) ---------- */
 if ($("faqList")) {   // solo si la sección existe
@@ -71,8 +84,8 @@ if ($("faqList")) {   // solo si la sección existe
 }
 
 /* ---------- Galería de stickers ---------- */
-if ($("gal")) {   // solo si la sección existe (vos la sacaste, así que se saltea)
-  CONFIG.gallery.forEach(([file, caption]) => {
+if ($("gal")) {   // solo si la sección existe
+  (CONFIG.gallery || []).forEach(([file, caption]) => {
     const fig = document.createElement("figure");
     const im = document.createElement("img"); im.src = img(file); im.alt = caption; im.loading = "lazy";
     const cap = document.createElement("figcaption"); cap.textContent = caption;
@@ -102,3 +115,15 @@ function tick() {
 }
 tick();
 setInterval(tick, 1000);   // se actualiza cada segundo
+
+/* ---------- Partes ocultas desde el editor ---------- */
+// clave (la misma que usa el editor) -> qué elemento(s) de la página oculta
+// Se esconden con display:none (no se borran) para que el resto del código siga funcionando
+const HIDEABLE = {
+  ticker: ".ticker",   bubble: "#bubble",   hint: ".hint",    count: "#count",
+  info: "#info",       lineup: "#lineup",   barra: "#barra",   gallery: "#lyra",
+  faq: "#faq",         join: ".join",       footer: "footer"
+};
+hidden.forEach(key => {
+  if (HIDEABLE[key]) document.querySelectorAll(HIDEABLE[key]).forEach(el => el.style.display = "none");
+});
