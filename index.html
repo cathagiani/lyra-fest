@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <!-- esta parte hace que la página se vea bien en celulares -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Lyra Fest ✦</title>
+
+  <!-- Vista previa al compartir el link (WhatsApp, Instagram, etc.).
+       Cuando tengas tu dominio, cambiá og:image por la URL completa, ej: https://tudominio.com/images/glow.webp -->
+  <meta name="description" content="Lyra Fest: la fiesta. Entradas, info y grupo de WhatsApp.">
+  <meta property="og:title" content="Lyra Fest ✦">
+  <meta property="og:description" content="LA FIESTA DEL INTERNET QUE TE PROMETIERON">
+  <meta property="og:image" content="images/glow.webp">
+
+  <!-- Ícono de la pestaña (un emoji, sin archivo extra) -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✨</text></svg>">
+
+  <!-- Tipografías de Google Fonts (Bungee para títulos, Fredoka para texto) -->
+  <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Estilos -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Tira de cuadrillé superior -->
+  <div class="checker"></div>
+  <!-- Cinta con texto que se mueve (el texto lo pone main.js) -->
+  <div class="ticker"><div id="tick"></div></div>
+
+  <main>
+    <!-- ========== PORTADA ========== -->
+    <header class="hero">
+      <span class="tag" id="tagline"></span>
+      <h1>Lyra<br>Fest</h1>
+
+      <!-- Lyra interactiva: al tocarla cambia de pose y de frase -->
+      <div class="stage" id="stage">
+        <img id="hero" src="images/glow.webp" alt="Lyra, la mascota de la fiesta">
+        <div class="bubble" id="bubble"></div>
+      </div>
+      <div class="hint">tocá a Lyra ✦</div>
+
+      <p class="sub" id="sub"></p>
+      <div class="count" id="count"></div>          <!-- cuenta regresiva -->
+      <div class="btns" id="heroBtns"></div>        <!-- botones: entradas / whatsapp / instagram -->
+    </header>
+
+    <!-- ========== INFO ========== -->
+    <section id="info">
+      <h2>Info</h2>
+      <div class="grid" id="infoGrid"></div>       <!-- tarjetas generadas desde config.js -->
+    </section>
+
+    <!-- ========== PREGUNTAS FRECUENTES ========== -->
+    <section id="faq">
+      <h2>FAQ</h2>
+      <div class="split">
+        <img src="images/hmm.webp" alt="Lyra dudando">
+        <div id="faqList"></div>
+      </div>
+    </section>
+
+    <!-- ========== LLAMADO FINAL ========== -->
+    <section class="join">
+      <h2 style="display:inline-block">Sumate</h2>
+      <img src="images/wave.webp" alt="Lyra saludando">
+      <p class="sub">Comprá tu entrada y entrá al grupo para enterarte de todo.</p>
+      <div class="btns" id="bottomBtns"></div>
+    </section>
+
+    <!-- ========== PIE DE PÁGINA ========== -->
+    <footer>
+      <img src="images/dead.webp" alt="Lyra dormida después de la fiesta">
+      Nos vemos en la pista ✦<br>
+      <a id="igFoot" target="_blank" rel="noopener">@lyra.fest</a>
+    </footer>
+  </main>
+
+  <!-- Tira de cuadrillé inferior -->
+  <div class="checker"></div>
+
+  <!-- Orden importante: primero tus datos (config.js), después la lógica (main.js) -->
+  <script src="js/config.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
