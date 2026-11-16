@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Editor · Lyra Fest</title>
+  <style>
+    /* ---- Estilo simple, mismo clima neón que la página ---- */
+    :root { --pink:#fb04a0; --green:#00d100; --cyan:#00f0ff; --ink:#0f0c22; --card:#2b2548; --muted:#c7b9ef; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: system-ui, "Segoe UI", sans-serif; background:#0f0c22; color:#fff6ff; line-height:1.4; }
+    main { max-width: 760px; margin: 0 auto; padding: 20px 16px 140px; }
+    h1 { margin: 0 0 4px; font-size: 1.6rem; }
+    h1 span { color: var(--pink); }
+    p.hint { color: var(--muted); margin: 0 0 18px; }
+    section, details { background: var(--card); border: 3px solid var(--ink); border-radius: 16px; padding: 14px 16px; margin-bottom: 16px; box-shadow: 4px 4px 0 var(--pink); }
+    h2 { margin: 0 0 10px; font-size: 1.1rem; color: var(--cyan); }
+    summary { cursor: pointer; font-weight: 700; color: var(--cyan); }
+    label.f { display: block; margin-bottom: 10px; }
+    label.f span { display: block; font-size: .85rem; color: var(--muted); margin-bottom: 3px; }
+    input, textarea { width: 100%; padding: 9px 10px; border-radius: 10px; border: 2px solid #4a4175; background: #1b1440; color: #fff; font: inherit; }
+    input:focus, textarea:focus { outline: none; border-color: var(--cyan); }
+    .row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
+    .row input.emoji { width: 62px; flex: none; text-align: center; }
+    .row input.mid { flex: 1; }
+    .row.stack { flex-direction: column; align-items: stretch; background: #1b1440; padding: 8px; border-radius: 12px; position: relative; }
+    .row.stack .x { position: absolute; top: 6px; right: 6px; }
+    button { font: inherit; font-weight: 700; cursor: pointer; border: 3px solid var(--ink); border-radius: 12px; padding: 9px 14px; }
+    button.x { background: #ff5d7a; color: #fff; padding: 6px 10px; flex: none; }
+    button.add { background: var(--cyan); color: var(--ink); }
+    button.clear { background: transparent; color: var(--muted); border: 2px solid #4a4175; padding: 6px 10px; margin-top: 6px; }
+    /* ---- Barra fija de abajo con los botones principales ---- */
+    .bar { position: fixed; left: 0; right: 0; bottom: 0; background: #0f0c22ee; border-top: 3px solid var(--pink); padding: 12px 16px; }
+    .bar .in { max-width: 760px; margin: 0 auto; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .save { background: var(--green); color: var(--ink); }
+    .pub { background: var(--pink); color: #fff; }
+    .view { color: var(--cyan); font-weight: 700; margin-left: auto; }
+    #status { white-space: pre-wrap; margin-top: 8px; font-size: .9rem; max-width: 760px; margin-inline: auto; }
+    #status.ok { color: #7dff7d; } #status.err { color: #ff8da1; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Editor de <span>Lyra Fest</span> ✦</h1>
+  <p class="hint">Cambiá lo que quieras y tocá <b>Guardar</b> (para verlo en tu compu) o <b>Listo, publicar</b> (lo sube a la página).</p>
+  <div id="app">Cargando…</div>
+</main>
+
+<!-- Barra fija con los botones -->
+<div class="bar">
+  <div class="in">
+    <button class="save" id="btnSave">💾 Guardar</button>
+    <button class="pub" id="btnPub">🚀 Listo, publicar</button>
+    <button class="pub" id="btnForce" hidden>⚠ Publicar igual (pisar lo del repo)</button>
+    <a class="view" href="/" target="_blank">Ver la página ↗</a>
+  </div>
+  <div id="status"></div>
+</div>
+
+<script>
+let cfg;   // acá vive toda la info mientras editás
+
+/* ---------- Helper para crear elementos sin riesgo de romper con comillas ---------- */
+function h(tag, props = {}, ...kids) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(props)) {
+    if (k === "class") e.className = v;
+    else if (k.startsWith("on")) e[k] = v;
+    else e.setAttribute(k, v);
+  }
+  kids.flat().forEach(c => e.append(c));
+  return e;
+}
+
+/* ---------- Campo de texto simple ligado a cfg ---------- */
+function text(label, obj, key, ph = "") {
+  const i = h("input", { placeholder: ph });
+  i.value = obj[key] ?? "";
+  i.oninput = () => obj[key] = i.value;
+  return h("label", { class: "f" }, h("span", {}, label), i);
+}
+
+/* ---------- Lista de objetos (info, barra, faq) ---------- */
+// spec: [clave, placeholder, clase]; blank: item vacío nuevo
+function objList(arr, spec, blank, stack = false) {
+  const box = h("div");
+  const draw = () => {
+    box.replaceChildren(
+      ...arr.map((item, i) => h("div", { class: "row" + (stack ? " stack" : "") },
+        ...spec.map(([k, ph, cls]) => {
+          const inp = h("input", { placeholder: ph, class: cls || "" });
+          inp.value = item[k] || "";
+          inp.oninput = () => item[k] = inp.value;
+          return inp;
+        }),
+        h("button", { class: "x", title: "Quitar", onclick: () => { arr.splice(i, 1); draw(); } }, "✕")
+      )),
+      h("button", { class: "add", onclick: () => { arr.push({ ...blank }); draw(); } }, "+ agregar")
+    );
+  };
+  draw();
+  return box;
+}
+
+/* ---------- Lista de textos sueltos (line-up, frases) ---------- */
+function strList(arr, ph) {
+  const box = h("div");
+  const draw = () => {
+    box.replaceChildren(
+      ...arr.map((val, i) => {
+        const inp = h("input", { placeholder: ph, class: "mid" });
+        inp.value = val;
+        inp.oninput = () => arr[i] = inp.value;
+        return h("div", { class: "row" }, inp,
+          h("button", { class: "x", onclick: () => { arr.splice(i, 1); draw(); } }, "✕"));
+      }),
+      h("button", { class: "add", onclick: () => { arr.push(""); draw(); } }, "+ agregar")
+    );
+  };
+  draw();
+  return box;
+}
+
+/* ---------- Arma toda la pantalla ---------- */
+function render() {
+  // Aseguramos que existan las listas
+  for (const k of ["info", "faq", "lineup", "barra", "heroSays"]) cfg[k] = cfg[k] || [];
+  cfg.links = cfg.links || {};
+
+  // Fecha: input de calendario <-> formato ISO con -03:00 (Argentina)
+  const dt = h("input", { type: "datetime-local" });
+  dt.value = (cfg.date || "").slice(0, 16);
+  dt.oninput = () => cfg.date = dt.value ? dt.value + ":00-03:00" : "";
+  const clear = h("button", { class: "clear", onclick: () => { dt.value = ""; cfg.date = ""; } }, "Borrar fecha (mostrar “próximamente”)");
+
+  const app = document.getElementById("app");
+  app.replaceChildren(
+    h("section", {}, h("h2", {}, "Portada"),
+      text("Etiqueta arriba del título", cfg, "tagline"),
+      text("Frase debajo de Lyra", cfg, "sub"),
+      h("label", { class: "f" }, h("span", {}, "Fecha y hora de la fiesta (cuenta regresiva)"), dt, clear)
+    ),
+    h("section", {}, h("h2", {}, "Links de los botones"),
+      text("🎟️ Entradas", cfg.links, "entradas", "https://..."),
+      text("💬 Grupo de WhatsApp", cfg.links, "whatsapp", "https://chat.whatsapp.com/..."),
+      text("📸 Instagram", cfg.links, "instagram", "https://instagram.com/...")
+    ),
+    h("section", {}, h("h2", {}, "Info (lugar, horario, edad…)"),
+      objList(cfg.info, [["ic", "😀", "emoji"], ["t", "Título", "mid"], ["p", "Texto", "mid"]], { ic: "✨", t: "", p: "" })
+    ),
+    h("section", {}, h("h2", {}, "Preguntas frecuentes"),
+      objList(cfg.faq, [["q", "Pregunta"], ["a", "Respuesta"]], { q: "", a: "" }, true)
+    ),
+    h("details", {}, h("summary", {}, "Más opciones"),
+      h("h2", { style: "margin-top:12px" }, "Line-up (solo se ve si la sección existe en el HTML)"),
+      strList(cfg.lineup, "Artista / DJ"),
+      h("h2", { style: "margin-top:14px" }, "La barra (solo se ve si la sección existe en el HTML)"),
+      objList(cfg.barra, [["ic", "😀", "emoji"], ["t", "Título", "mid"], ["p", "Texto", "mid"]], { ic: "🍹", t: "", p: "" }),
+      h("h2", { style: "margin-top:14px" }, "Frases del globo de Lyra"),
+      strList(cfg.heroSays, "Frase")
+    )
+  );
+}
+
+/* ---------- Guardar / publicar ---------- */
+const status = document.getElementById("status");
+function say(msg, ok) { status.textContent = msg; status.className = ok ? "ok" : "err"; }
+
+const btnForce = document.getElementById("btnForce");   // botón "Publicar igual" (solo aparece si hay choque)
+
+async function send(url, label) {
+  say(label, true);
+  btnForce.hidden = true;
+  try {
+    const r = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(cfg) });
+    const d = await r.json();
+    say(d.msg || "Listo", d.ok !== false);
+    if (d.conflict) btnForce.hidden = false;   // ofrece pisar lo que hay en GitHub
+  } catch (e) { say("No se pudo conectar con el editor. ¿Sigue abierta la ventana negra?", false); }
+}
+document.getElementById("btnSave").onclick = () => send("/api/save", "Guardando…");
+document.getElementById("btnPub").onclick = () => {
+  if (confirm("¿Publicar los cambios en la página?")) send("/api/publish", "Subiendo a GitHub… (puede tardar unos segundos)");
+};
+btnForce.onclick = () => {
+  if (confirm("Esto reemplaza lo que otra persona cambió en GitHub por lo que tenés acá. ¿Seguro?")) send("/api/publish?overwrite=1", "Subiendo a GitHub…");
+};
+
+/* ---------- Arranque ---------- */
+fetch("/api/config").then(r => r.json()).then(c => { cfg = c; render(); })
+  .catch(() => document.getElementById("app").textContent = "No se pudo leer js/config.js");
+</script>
+</body>
+</html>
