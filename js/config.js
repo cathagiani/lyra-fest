@@ -6,10 +6,10 @@
 const CONFIG = {
 
   // Etiqueta chiquita arriba del título
-  tagline: "✦ la MEJOR fiesta ✦",
+  tagline: "✦ La Fiesta del Internet que te PROMETIERON ✦",
 
   // Frase debajo de Lyra
-  sub: "Mientras más cringe des, MEJOR!",
+  sub: "Mientras más cringe des, MEJOR! (˶˃𐃷˂˶)",
 
   // Fecha y hora (formato ISO, -03:00 = Argentina). Vacío = “Fecha próximamente”
   date: "",
@@ -34,8 +34,12 @@ const CONFIG = {
   // Preguntas frecuentes (q = pregunta, a = respuesta)
   faq: [
     {"q":"¿Dónde compro las entradas?","a":"Tocá el botón “Entradas” de esta página."},
+    {"q":"¿Qué metodos de pago aceptan?","a":"Aceptamos Débito, Crédito, Mercado Pago y prácticamente cualquier billetera virtual."},
+    {"q":"¿Puedo ir con amigxs?","a":"¡Obvio! Cuantxs más, mejor."},
     {"q":"¿Cómo me entero de las novedades?","a":"Sumate al grupo de WhatsApp y seguinos en Instagram."},
-    {"q":"¿Puedo ir con amigxs?","a":"¡Obvio! Cuantxs más, mejor."}
+    {"q":"¿A qué hora suelen abrir las puertas?","a":"Las puertas abren a las 12:30AM :D"},
+    {"q":"¿Se permiten menores de edad?","a":"No. +18 Sin Excepción."},
+    {"q":"¿Cómo me puedo contactar con la organización?","a":"Podes enviarnos un correo eléctronico mediante: contactolyrafest@gmail.com"}
   ],
 
   // Poses que rotan en la portada (archivos de /images, sin .webp)
@@ -49,13 +53,17 @@ const CONFIG = {
 
   // Frases del globo de diálogo de Lyra
   heroSays: [
-    "¡hola, hola!",
-    "¿ya abrieron?",
-    "glowsticks arriba!",
-    "guardame un lugar",
-    "nos vemos en la pista",
-    "vamo’ a bailar!",
-    "traje mi botella"
+    "¡HOLAAA! ⸜(｡˃ ᵕ ˂ )⸝♡ ",
+    "¡No olvides invitar a tus amigxs!",
+    "El internet NUNCA muere ʕ•ᴥ•ʔ <3",
+    "Necesito más vodka...",
+    "⸜(｡˃ ᵕ ˂ )⸝♡",
+    "NYAN NYAN NYAN NYAN",
+    "¿Estás buscando un Easter Egg? ( ͡° ͜ʖ ͡°)",
+    "˚♬゚。I know this pretty rave girl... ♫⋆｡",
+    "¡¡¡LYRA 4 EVER!!!",
+    "RAWR x3",
+    "Quiero un emo boy... u_u"
   ],
 
   // Galería: [archivo, epígrafe]
