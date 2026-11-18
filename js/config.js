@@ -23,11 +23,11 @@ const CONFIG = {
 
   // Tarjetas de la sección Info (ic = emoji, t = título, p = texto)
   info: [
-    {"ic":"📅","t":"Fecha","p":"Próximamente"},
+    {"ic":"📅","t":"Fecha","p":"Próximamente!"},
     {"ic":"🕙","t":"Horario","p":"23:59-06:00"},
     {"ic":"📍","t":"Lugar","p":"VOX BA (SUBSUELO) - Hipolito Yrigoyen 968 CABA"},
-    {"ic":"🎟️","t":"Entradas","p":"Próximamente"},
-    {"ic":"🔞","t":"Edad","p":"+18"},
+    {"ic":"🎟️","t":"Entradas","p":"Próximamente!"},
+    {"ic":"🔞","t":"Edad","p":"Solo para mayores de 18 Años."},
     {"ic":"👗","t":"Dress-Code","p":"MIENTRAS MAS CRINGE, MEJOR"}
   ],
 
