@@ -19,15 +19,30 @@ $("igFoot").href = CONFIG.links.instagram;
 $("tick").textContent = "✦ LYRA FEST ✦ GLOWSTICKS ✦ NEÓN ✦ PISTA ✦ ".repeat(8);
 
 /* ---------- Lyra interactiva de la portada ---------- */
+// Precarga las poses para que no parpadee al cambiar
+CONFIG.heroPoses.forEach(p => { new Image().src = img(p); });
+
 let pose = 0;
+let timer;   // temporizador del cambio automático
+
 function showHero() {
   $("hero").src = img(CONFIG.heroPoses[pose % CONFIG.heroPoses.length]);
   // Frase al azar
   $("bubble").textContent = CONFIG.heroSays[Math.floor(Math.random() * CONFIG.heroSays.length)];
 }
+
+// Pasa a la siguiente pose y reinicia la cuenta de 5 segundos
+// (así el cambio automático nunca se pisa con un clic)
+function nextHero() {
+  pose++;
+  showHero();
+  clearInterval(timer);
+  timer = setInterval(nextHero, 5000);
+}
+
 showHero();
-$("stage").onclick = () => { pose++; showHero(); };   // al tocar: siguiente pose
-setInterval(() => { pose++; showHero(); }, 5000);     // sola, cada 5 segundos
+timer = setInterval(nextHero, 5000);   // cambio automático cada 5 segundos
+$("stage").onclick = nextHero;         // al tocar: siguiente pose
 
 /* ---------- Botones (entradas / whatsapp / instagram) ---------- */
 function makeBtn(label, href, cls) {
