@@ -101,7 +101,9 @@ const CONFIG = {
   theme: {},
 
   // Imagen de cada sección (vacío = la original, none = sin imagen)
-  slots: {},
+  slots: {
+    "logo": "lyra-logo.webp"
+  },
 
   // CSS propio (avanzado)
   customCss: ""

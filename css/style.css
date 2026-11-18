@@ -224,3 +224,7 @@ footer a { color: var(--pink); font-weight: 700; }
 .extra .body { flex: 1 1 260px; }
 .extra h2 { margin-bottom: 12px; }
 .extra p { margin: 0; color: var(--muted); font-size: 1.1rem; white-space: pre-line; }
+
+
+/* Logo que reemplaza el título grande (lo elige el editor) */
+.logo-title { display: block; margin: 0 auto; width: min(86vw, 480px); height: auto; filter: drop-shadow(0 0 24px #fb04a088); }

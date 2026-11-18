@@ -141,7 +141,7 @@ const TEXTS = [
 
 /* Slots de imagen: [clave, nombre, parte de la página] */
 const SLOTS = [
-  ["lineup", "Line-up", "lineup"], ["barra1", "La barra (izquierda)", "barra"], ["barra2", "La barra (centro)", "barra"],
+  ["logo", "Logo (reemplaza el título grande de la portada)", null], ["lineup", "Line-up", "lineup"], ["barra1", "La barra (izquierda)", "barra"], ["barra2", "La barra (centro)", "barra"],
   ["barra3", "La barra (derecha)", "barra"], ["faq", "FAQ", "faq"], ["join", "Sumate", "join"], ["footer", "Pie de página", "footer"]
 ];
 
@@ -405,7 +405,7 @@ function viewImages() {
     })));
 
   // Imagen de cada sección
-  const slotRows = SLOTS.filter(([, , part]) => has(part)).map(([key, label]) =>
+  const slotRows = SLOTS.filter(([, , part]) => !part || has(part)).map(([key, label]) =>
     h("label", { class: "f" }, h("span", {}, label),
       imgPicker(cfg.slots[key] || "", v => { if (v) cfg.slots[key] = v; else delete cfg.slots[key]; }, { blank: "(la original)", none: true })));
   const slots = h("section", {}, h("h2", {}, "Imagen de cada sección"),

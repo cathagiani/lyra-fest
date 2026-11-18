@@ -93,6 +93,17 @@ Object.entries(SLOT_MAP).forEach(([key, sel]) => {
   $$(sel).forEach(el => { if (v === "none") el.style.display = "none"; else el.src = img(v); });
 });
 
+/* ---------- Logo en lugar del título grande ---------- */
+// Si en el editor elegís una imagen para "Logo", reemplaza el texto "Lyra Fest" de la portada
+if (SLOTS.logo && SLOTS.logo !== "none") {
+  const t = document.querySelector("h1");
+  if (t) {
+    const im = new Image();
+    im.src = img(SLOTS.logo); im.alt = "Lyra Fest"; im.className = "logo-title";
+    t.textContent = ""; t.append(im);
+  }
+}
+
 /* ---------- Cinta que se mueve ---------- */
 // Se repite el texto (en cantidad PAR) para que el loop no tenga cortes
 const tickBase = (T.tickerText || "✦ LYRA FEST ✦ GLOWSTICKS ✦ NEÓN ✦ PISTA ✦").trim() + " ";
