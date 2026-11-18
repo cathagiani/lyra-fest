@@ -25,10 +25,10 @@ const CONFIG = {
   info: [
     {"ic":"📅","t":"Fecha","p":"Próximamente"},
     {"ic":"🕙","t":"Horario","p":"23:59-06:00"},
-    {"ic":"📍","t":"Lugar","p":"VOX BA, Hipolito Yrigoyen 968, Buenos Aires, Argentina 1086"},
+    {"ic":"📍","t":"Lugar","p":"VOX BA (SUBSUELO) - Hipolito Yrigoyen 968 CABA"},
     {"ic":"🎟️","t":"Entradas","p":"Próximamente"},
     {"ic":"🔞","t":"Edad","p":"+18"},
-    {"ic":"👗","t":"Dress code","p":"MIENTRAS MAS CRINGE, MEJOR"}
+    {"ic":"👗","t":"Dress-Code","p":"MIENTRAS MAS CRINGE, MEJOR"}
   ],
 
   // Preguntas frecuentes (q = pregunta, a = respuesta)
