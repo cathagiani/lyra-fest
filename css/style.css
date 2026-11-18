@@ -200,3 +200,27 @@ footer a { color: var(--pink); font-weight: 700; }
 
 /* Respeta a quienes desactivan animaciones en su dispositivo */
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+
+
+/* =====================================================
+   AJUSTES QUE USA EL EDITOR (modo, cuadrícula, animaciones, bloques extra)
+   ===================================================== */
+
+/* Modo forzado desde el editor: siempre oscuro / siempre claro */
+:root[data-mode="dark"]  { --bg: #0f0c22; --bg2: #1b1440; --card: #2b2548; --text: #fff6ff; --muted: #c7b9ef; --h1: #fff; color-scheme: dark; }
+:root[data-mode="light"] { --bg: #fff2fb; --bg2: #ffe3f6; --card: #ffffff; --text: #1a1233; --muted: #5b4a8a; --h1: #1a1233; color-scheme: light; }
+
+/* Sin cuadrícula de fondo (queda solo el degradé) */
+:root[data-grid="off"] body { background-image: linear-gradient(180deg, var(--bg), var(--bg2)); }
+
+/* Sin animaciones */
+:root[data-anim="off"] *, :root[data-anim="off"] *::before, :root[data-anim="off"] *::after { animation: none !important; }
+
+/* Bloques extra (imagen + título + texto armados desde el editor) */
+.extra { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
+.extra.right { flex-direction: row-reverse; }
+.extra.top { flex-direction: column; text-align: center; }
+.extra img { max-height: 280px; max-width: 100%; width: auto; filter: drop-shadow(0 0 16px #00f0ff66); margin: 0 auto; }
+.extra .body { flex: 1 1 260px; }
+.extra h2 { margin-bottom: 12px; }
+.extra p { margin: 0; color: var(--muted); font-size: 1.1rem; white-space: pre-line; }

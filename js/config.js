@@ -16,9 +16,9 @@ const CONFIG = {
 
   // Links de los botones (vacío = botón apagado con “(pronto)”)
   links: {
-    entradas: "",
-    whatsapp: "https://chat.whatsapp.com/JJEiKeKRFpBFI2FSNb4pSB?s=sh&p=i&iam=2",
-    instagram: "https://www.instagram.com/lyra.fest/"
+    "entradas": "",
+    "whatsapp": "https://chat.whatsapp.com/JJEiKeKRFpBFI2FSNb4pSB?s=sh&p=i&iam=2",
+    "instagram": "https://www.instagram.com/lyra.fest/"
   },
 
   // Tarjetas de la sección Info (ic = emoji, t = título, p = texto)
@@ -42,13 +42,13 @@ const CONFIG = {
     {"q":"¿Cómo me puedo contactar con la organización?","a":"Podes enviarnos un correo eléctronico mediante: contactolyrafest@gmail.com"}
   ],
 
-  // Poses que rotan en la portada (archivos de /images, sin .webp)
+  // Poses que rotan en la portada (archivos de /images)
   heroPoses: [
-    "glow",
-    "jump",
-    "wave",
-    "bottle",
-    "cross"
+    "glow.webp",
+    "jump.webp",
+    "wave.webp",
+    "bottle.webp",
+    "cross.webp"
   ],
 
   // Frases del globo de diálogo de Lyra
@@ -68,16 +68,16 @@ const CONFIG = {
 
   // Galería: [archivo, epígrafe]
   gallery: [
-    ["cross","lista para entrar"],
-    ["jump","¡¡abrieron las puertas!!"],
-    ["sit","esperando en la fila"],
-    ["glow","glowsticks al aire"],
-    ["vodka","ronda de brindis"],
-    ["fernet","fernecito, obvio"],
-    ["bottle","edición Lyra ♡"],
-    ["wave","¡hola, hola!"],
-    ["hmm","“ya cerramos”…"],
-    ["dead","lunes post-fiesta"]
+    ["cross.webp","lista para entrar"],
+    ["jump.webp","¡¡abrieron las puertas!!"],
+    ["sit.webp","esperando en la fila"],
+    ["glow.webp","glowsticks al aire"],
+    ["vodka.webp","ronda de brindis"],
+    ["fernet.webp","fernecito, obvio"],
+    ["bottle.webp","edición Lyra ♡"],
+    ["wave.webp","¡hola, hola!"],
+    ["hmm.webp","“ya cerramos”…"],
+    ["dead.webp","lunes post-fiesta"]
   ],
 
   // Artistas / DJs
@@ -87,5 +87,20 @@ const CONFIG = {
   barra: [],
 
   // Partes de la página ocultas (lo maneja el editor; borrá un nombre de la lista para volver a mostrarla)
-  hidden: []
+  hidden: [],
+
+  // Bloques extra (imagen y/o texto) que se suman a la página
+  extras: [],
+
+  // Textos de la página (vacío = el original)
+  texts: {},
+
+  // Colores, tipografías y modo (vacío = el original)
+  theme: {},
+
+  // Imagen de cada sección (vacío = la original, none = sin imagen)
+  slots: {},
+
+  // CSS propio (avanzado)
+  customCss: ""
 };

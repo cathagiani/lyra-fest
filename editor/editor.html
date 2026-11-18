@@ -9,46 +9,82 @@
     :root { --pink:#fb04a0; --green:#00d100; --cyan:#00f0ff; --ink:#0f0c22; --card:#2b2548; --muted:#c7b9ef; }
     * { box-sizing: border-box; }
     body { margin:0; font-family: system-ui, "Segoe UI", sans-serif; background:#0f0c22; color:#fff6ff; line-height:1.4; }
-    main { max-width: 760px; margin: 0 auto; padding: 20px 16px 140px; }
+    main { max-width: 800px; margin: 0 auto; padding: 20px 16px 150px; }
     h1 { margin: 0 0 4px; font-size: 1.6rem; }
     h1 span { color: var(--pink); }
-    p.hint { color: var(--muted); margin: 0 0 18px; }
+    p.hint { color: var(--muted); margin: 0 0 14px; }
     section, details { background: var(--card); border: 3px solid var(--ink); border-radius: 16px; padding: 14px 16px; margin-bottom: 16px; box-shadow: 4px 4px 0 var(--pink); }
     h2 { margin: 0 0 10px; font-size: 1.1rem; color: var(--cyan); }
     summary { cursor: pointer; font-weight: 700; color: var(--cyan); }
     label.f { display: block; margin-bottom: 10px; }
     label.f span { display: block; font-size: .85rem; color: var(--muted); margin-bottom: 3px; }
-    input, textarea { width: 100%; padding: 9px 10px; border-radius: 10px; border: 2px solid #4a4175; background: #1b1440; color: #fff; font: inherit; }
-    input:focus, textarea:focus { outline: none; border-color: var(--cyan); }
+    input, textarea, select { width: 100%; padding: 9px 10px; border-radius: 10px; border: 2px solid #4a4175; background: #1b1440; color: #fff; font: inherit; }
+    input:focus, textarea:focus, select:focus { outline: none; border-color: var(--cyan); }
+    textarea { resize: vertical; min-height: 64px; }
+    textarea.code { font-family: Consolas, "Courier New", monospace; font-size: .85rem; min-height: 150px; }
     .row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
+    .row .grow { flex: 1; }
     .row input.emoji { width: 62px; flex: none; text-align: center; }
     .row input.mid { flex: 1; }
+    .row select { flex: 1; }
     .row.stack { flex-direction: column; align-items: stretch; background: #1b1440; padding: 8px; border-radius: 12px; position: relative; }
     .row.stack .x { position: absolute; top: 6px; right: 6px; }
     button { font: inherit; font-weight: 700; cursor: pointer; border: 3px solid var(--ink); border-radius: 12px; padding: 9px 14px; }
     button.x { background: #ff5d7a; color: #fff; padding: 6px 10px; flex: none; }
     button.add { background: var(--cyan); color: var(--ink); }
     button.clear { background: transparent; color: var(--muted); border: 2px solid #4a4175; padding: 6px 10px; margin-top: 6px; }
+    button.mini { background: #1b1440; color: #fff; border: 2px solid #4a4175; padding: 6px 10px; flex: none; }
+    p.note { color: var(--muted); font-size: .85rem; margin: 0 0 10px; }
+
+    /* ---- Pestañas ---- */
+    .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+    .tabs button { background: #1b1440; color: var(--muted); border: 2px solid #4a4175; }
+    .tabs button.on { background: var(--pink); color: #fff; border-color: var(--ink); }
+
     /* ---- Barra fija de abajo con los botones principales ---- */
-    .bar { position: fixed; left: 0; right: 0; bottom: 0; background: #0f0c22ee; border-top: 3px solid var(--pink); padding: 12px 16px; }
-    .bar .in { max-width: 760px; margin: 0 auto; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .bar { position: fixed; left: 0; right: 0; bottom: 0; background: #0f0c22ee; border-top: 3px solid var(--pink); padding: 12px 16px; z-index: 5; }
+    .bar .in { max-width: 800px; margin: 0 auto; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
     .save { background: var(--green); color: var(--ink); }
     .pub { background: var(--pink); color: #fff; }
     .view { color: var(--cyan); font-weight: 700; margin-left: auto; }
-    /* ---- Casillas de mostrar/ocultar y miniaturas de la galería ---- */
+    #status { white-space: pre-wrap; margin-top: 8px; font-size: .9rem; max-width: 800px; margin-inline: auto; max-height: 90px; overflow: auto; }
+    #status.ok { color: #7dff7d; } #status.err { color: #ff8da1; }
+
+    /* ---- Casillas y miniaturas ---- */
     .checks { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 8px; }
     label.chk { display: flex; align-items: center; gap: 10px; background: #1b1440; padding: 9px 12px; border-radius: 12px; cursor: pointer; }
     label.chk input { width: 20px; height: 20px; flex: none; accent-color: var(--pink); }
-    p.note { color: var(--muted); font-size: .85rem; margin: 0 0 10px; }
-    img.thumb { height: 46px; width: auto; flex: none; }
-    #status { white-space: pre-wrap; margin-top: 8px; font-size: .9rem; max-width: 760px; margin-inline: auto; }
-    #status.ok { color: #7dff7d; } #status.err { color: #ff8da1; }
+    img.thumb { height: 46px; width: 46px; object-fit: contain; flex: none; }
+
+    /* ---- Biblioteca de imágenes ---- */
+    .drop { border: 3px dashed #4a4175; border-radius: 14px; padding: 18px; text-align: center; color: var(--muted); margin-bottom: 12px; }
+    .drop.over { border-color: var(--cyan); background: #1b1440; }
+    .tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; }
+    .tile { background: #1b1440; border-radius: 12px; padding: 8px; text-align: center; position: relative; border: 3px solid transparent; }
+    .tile img { height: 84px; width: 100%; object-fit: contain; }
+    .tile .nm { font-size: .72rem; word-break: break-all; color: var(--muted); }
+    .tile .badge { font-size: .65rem; color: var(--cyan); }
+    .tile .x { position: absolute; top: 4px; right: 4px; padding: 2px 7px; font-size: .8rem; }
+    .tile.pick { cursor: pointer; }
+    .tile.sel { border-color: var(--pink); }
+    .tile .ord { position: absolute; top: 4px; left: 4px; background: var(--pink); color: #fff; border-radius: 99px; min-width: 22px; height: 22px; font-size: .8rem; font-weight: 700; display: grid; place-items: center; }
+
+    /* ---- Diseño ---- */
+    .colorrow input[type=color] { width: 56px; height: 38px; padding: 2px; flex: none; cursor: pointer; }
+    .colorrow.mod .grow { color: var(--cyan); font-weight: 700; }
+    .sample { margin: 6px 0 12px; padding: 10px; border-radius: 10px; background: #1b1440; font-size: 1.3rem; }
+
+    /* ---- Bloques extra ---- */
+    .block { background: #1b1440; border-radius: 14px; padding: 12px; margin-bottom: 12px; border: 2px solid #4a4175; }
+    .block .top { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; flex-wrap: wrap; }
+    .block .top select { flex: 1; min-width: 150px; }
   </style>
 </head>
 <body>
 <main>
   <h1>Editor de <span>Lyra Fest</span> ✦</h1>
   <p class="hint">Cambiá lo que quieras y tocá <b>Guardar</b> (para verlo en tu compu) o <b>Listo, publicar</b> (lo sube a la página).</p>
+  <nav class="tabs" id="tabs"></nav>
   <div id="app">Cargando…</div>
 </main>
 
@@ -64,8 +100,56 @@
 </div>
 
 <script>
-let cfg;          // acá vive toda la info mientras editás
-let parts = [];   // partes de la página que se pueden ocultar (las manda el servidor)
+let cfg;                 // acá vive toda la info mientras editás
+let parts = [];          // partes de la página que existen (las manda el servidor)
+let images = [];         // biblioteca de imágenes [{name, size}]
+let tab = "content";     // pestaña abierta
+
+/* Imágenes que ya vienen puestas en el HTML original (para avisar antes de borrarlas) */
+const ORIGINAL = { "glow.webp": "la portada", "sit.webp": "Line-up", "vodka.webp": "La barra", "bottle.webp": "La barra",
+  "fernet.webp": "La barra", "hmm.webp": "FAQ", "wave.webp": "Sumate", "dead.webp": "el pie de página" };
+
+/* Tipografías disponibles (Google Fonts) */
+const FONTS = ["Bungee", "Fredoka", "Press Start 2P", "Righteous", "Baloo 2", "Lilita One", "Chango", "Monoton", "Orbitron",
+  "Permanent Marker", "Pacifico", "Poppins", "Nunito", "Space Grotesk", "Rubik", "Quicksand", "Pixelify Sans", "Silkscreen"];
+
+/* Colores editables: [clave, nombre, color original] */
+const COLORS = [
+  ["pink", "Rosa (botones, sombras)", "#fb04a0"], ["green", "Verde (WhatsApp, cinta)", "#00d100"], ["cyan", "Cian (Instagram, etiquetas)", "#00f0ff"],
+  ["ink", "Bordes y contornos", "#0f0c22"], ["bg", "Fondo (arriba)", "#0f0c22"], ["bg2", "Fondo (abajo)", "#1b1440"],
+  ["card", "Tarjetas", "#2b2548"], ["text", "Texto", "#fff6ff"], ["muted", "Texto secundario", "#c7b9ef"], ["h1", "Títulos", "#ffffff"]
+];
+
+/* Textos editables: [clave, nombre, texto original, parte de la página que lo necesita, multilínea] */
+const TEXTS = [
+  ["heroTitle", "Título grande (Enter = salto de línea)", "Lyra\nFest", null, true],
+  ["hintText", "Texto bajo Lyra", "tocá a Lyra ✦", "hint"],
+  ["tickerText", "Cinta que se mueve", "✦ LYRA FEST ✦ GLOWSTICKS ✦ NEÓN ✦ PISTA ✦", "ticker"],
+  ["btnEntradas", "Botón Entradas", "🎟️ Entradas", "btnEntradas"],
+  ["btnWhatsapp", "Botón WhatsApp", "💬 Grupo de WhatsApp", "btnWhatsapp"],
+  ["btnInstagram", "Botón Instagram", "📸 Instagram", "btnInstagram"],
+  ["infoTitle", "Título de Info", "Info", "info"],
+  ["lineupTitle", "Título de Line-up", "Line-up", "lineup"],
+  ["barraTitle", "Título de La barra", "La barra", "barra"],
+  ["lyraTitle", "Título de la galería", "Conocé a Lyra", "gallery"],
+  ["lyraSub", "Texto de la galería", "La mascota oficial de la fiesta. Tocá cada sticker.", "gallery"],
+  ["faqTitle", "Título de FAQ", "FAQ", "faq"],
+  ["joinTitle", "Título del final", "Sumate", "join"],
+  ["joinText", "Texto del final", "Comprá tu entrada y entrá al grupo para enterarte de todo.", "join", true],
+  ["footerText", "Texto del pie de página", "Nos vemos en la pista · lunes: no sabemos nada ✦", "footer"]
+];
+
+/* Slots de imagen: [clave, nombre, parte de la página] */
+const SLOTS = [
+  ["lineup", "Line-up", "lineup"], ["barra1", "La barra (izquierda)", "barra"], ["barra2", "La barra (centro)", "barra"],
+  ["barra3", "La barra (derecha)", "barra"], ["faq", "FAQ", "faq"], ["join", "Sumate", "join"], ["footer", "Pie de página", "footer"]
+];
+
+const WHERE = [["hero", "Después de la portada"], ["info", "Después de Info"], ["lineup", "Después de Line-up"], ["barra", "Después de La barra"],
+  ["lyra", "Después de la galería"], ["faq", "Después de FAQ"], ["join", "Antes de “Sumate”"], ["end", "Al final (antes del pie)"]];
+
+const has = k => parts.some(p => p.key === k);
+const norm = n => /\.[a-z0-9]+$/i.test(n) ? n : n + ".webp";   // "glow" -> "glow.webp"
 
 /* ---------- Helper para crear elementos sin riesgo de romper con comillas ---------- */
 function h(tag, props = {}, ...kids) {
@@ -80,8 +164,8 @@ function h(tag, props = {}, ...kids) {
 }
 
 /* ---------- Campo de texto simple ligado a cfg ---------- */
-function text(label, obj, key, ph = "") {
-  const i = h("input", { placeholder: ph });
+function text(label, obj, key, ph = "", multi = false) {
+  const i = h(multi ? "textarea" : "input", { placeholder: ph });
   i.value = obj[key] ?? "";
   i.oninput = () => obj[key] = i.value;
   return h("label", { class: "f" }, h("span", {}, label), i);
@@ -128,17 +212,40 @@ function strList(arr, ph) {
   return box;
 }
 
-/* ---------- Galería de stickers: cambiar epígrafe o quitar ---------- */
+/* ---------- Selector de imagen de la biblioteca (con miniatura) ---------- */
+// opts.blank: texto de la opción vacía; opts.none: ofrece "(sin imagen)"
+function imgPicker(value, onchange, opts = {}) {
+  const sel = h("select");
+  sel.append(h("option", { value: "" }, opts.blank || "— elegir imagen —"));
+  if (opts.none) sel.append(h("option", { value: "none" }, "(sin imagen)"));
+  images.forEach(i => sel.append(h("option", { value: i.name }, i.name)));
+  // si el archivo ya no existe, igual lo mostramos para que se note
+  if (value && value !== "none" && !images.some(i => i.name === value)) sel.append(h("option", { value }, value + " (no existe)"));
+  sel.value = value || "";
+  const pv = h("img", { class: "thumb", alt: "" });
+  const upd = () => {
+    if (sel.value && sel.value !== "none") { pv.src = "/images/" + sel.value; pv.style.visibility = "visible"; }
+    else pv.style.visibility = "hidden";
+  };
+  sel.onchange = () => { onchange(sel.value); upd(); };
+  upd();
+  return h("div", { class: "row" }, pv, sel);
+}
+
+/* ---------- Galería de stickers: cambiar epígrafe, quitar o agregar ---------- */
 function galList(arr) {
   const box = h("div");
-  const draw = () => box.replaceChildren(...arr.map((it, i) => {
-    const inp = h("input", { class: "mid", placeholder: "Epígrafe" });
-    inp.value = it[1] || "";
-    inp.oninput = () => it[1] = inp.value;
-    return h("div", { class: "row" },
-      h("img", { class: "thumb", src: "/images/" + it[0] + ".webp", alt: it[0] }), inp,
-      h("button", { class: "x", title: "Quitar de la galería", onclick: () => { arr.splice(i, 1); draw(); } }, "✕"));
-  }));
+  const draw = () => box.replaceChildren(
+    ...arr.map((it, i) => {
+      const inp = h("input", { class: "mid", placeholder: "Epígrafe" });
+      inp.value = it[1] || "";
+      inp.oninput = () => it[1] = inp.value;
+      return h("div", { class: "row" },
+        h("img", { class: "thumb", src: "/images/" + it[0], alt: it[0] }), inp,
+        h("button", { class: "x", title: "Quitar de la galería", onclick: () => { arr.splice(i, 1); draw(); } }, "✕"));
+    }),
+    imgPicker("", v => { if (v) { arr.push([v, ""]); draw(); } }, { blank: "+ agregar sticker a la galería…" })
+  );
   draw();
   return box;
 }
@@ -146,7 +253,6 @@ function galList(arr) {
 /* ---------- Casillas: mostrar / ocultar partes de la página ---------- */
 // Tildado = se ve. Destildado = se oculta (se guarda en cfg.hidden)
 function visibility() {
-  cfg.hidden = cfg.hidden || [];
   return h("section", {}, h("h2", {}, "Mostrar u ocultar partes de la página"),
     h("p", { class: "note" }, "Destildá lo que no quieras que aparezca. Podés volver a tildarlo cuando quieras."),
     h("div", { class: "checks" }, ...parts.map(({ key, label }) => {
@@ -160,12 +266,10 @@ function visibility() {
     })));
 }
 
-/* ---------- Arma toda la pantalla ---------- */
-function render() {
-  // Aseguramos que existan las listas
-  for (const k of ["info", "faq", "lineup", "barra", "heroSays"]) cfg[k] = cfg[k] || [];
-  cfg.links = cfg.links || {};
-
+/* =====================================================
+   PESTAÑA 1: CONTENIDO
+   ===================================================== */
+function viewContent() {
   // Fecha: input de calendario <-> formato ISO con -03:00 (Argentina)
   const dt = h("input", { type: "datetime-local" });
   dt.value = (cfg.date || "").slice(0, 16);
@@ -173,42 +277,265 @@ function render() {
   const clear = h("button", { class: "clear", onclick: () => { dt.value = ""; cfg.date = ""; } }, "Borrar fecha (mostrar “próximamente”)");
 
   // "Más opciones": solo muestra lo que existe en tu index.html
-  const has = k => parts.some(p => p.key === k);
-  cfg.gallery = cfg.gallery || [];
   const more = [];
-  if (has("lineup")) more.push(
-    h("h2", { style: "margin-top:12px" }, "Line-up"), strList(cfg.lineup, "Artista / DJ"));
-  if (has("barra")) more.push(
-    h("h2", { style: "margin-top:14px" }, "La barra"),
+  if (has("lineup")) more.push(h("h2", { style: "margin-top:12px" }, "Line-up"), strList(cfg.lineup, "Artista / DJ"));
+  if (has("barra")) more.push(h("h2", { style: "margin-top:14px" }, "La barra"),
     objList(cfg.barra, [["ic", "😀", "emoji"], ["t", "Título", "mid"], ["p", "Texto", "mid"]], { ic: "🍹", t: "", p: "" }));
-  if (has("gallery")) more.push(
-    h("h2", { style: "margin-top:14px" }, "Galería de stickers"),
-    h("p", { class: "note" }, "Quitar un sticker lo saca de la galería (el archivo de la imagen sigue en la carpeta)."),
-    galList(cfg.gallery));
+  if (has("gallery")) more.push(h("h2", { style: "margin-top:14px" }, "Galería de stickers"),
+    h("p", { class: "note" }, "Podés cambiar epígrafes, quitar stickers o sumar imágenes de tu biblioteca."), galList(cfg.gallery));
   more.push(h("h2", { style: "margin-top:14px" }, "Frases del globo de Lyra"), strList(cfg.heroSays, "Frase"));
 
-  const app = document.getElementById("app");
-  app.replaceChildren(
+  return [
     h("section", {}, h("h2", {}, "Portada"),
       text("Etiqueta arriba del título", cfg, "tagline"),
       text("Frase debajo de Lyra", cfg, "sub"),
-      h("label", { class: "f" }, h("span", {}, "Fecha y hora de la fiesta (cuenta regresiva)"), dt, clear)
-    ),
+      h("label", { class: "f" }, h("span", {}, "Fecha y hora de la fiesta (cuenta regresiva)"), dt, clear)),
     h("section", {}, h("h2", {}, "Links de los botones"),
       text("🎟️ Entradas", cfg.links, "entradas", "https://..."),
       text("💬 Grupo de WhatsApp", cfg.links, "whatsapp", "https://chat.whatsapp.com/..."),
-      text("📸 Instagram", cfg.links, "instagram", "https://instagram.com/...")
-    ),
+      text("📸 Instagram", cfg.links, "instagram", "https://instagram.com/...")),
     visibility(),
     h("section", {}, h("h2", {}, "Info (lugar, horario, edad…)"),
-      objList(cfg.info, [["ic", "😀", "emoji"], ["t", "Título", "mid"], ["p", "Texto", "mid"]], { ic: "✨", t: "", p: "" })
-    ),
+      objList(cfg.info, [["ic", "😀", "emoji"], ["t", "Título", "mid"], ["p", "Texto", "mid"]], { ic: "✨", t: "", p: "" })),
     h("section", {}, h("h2", {}, "Preguntas frecuentes"),
-      objList(cfg.faq, [["q", "Pregunta"], ["a", "Respuesta"]], { q: "", a: "" }, true)
-    ),
+      objList(cfg.faq, [["q", "Pregunta"], ["a", "Respuesta"]], { q: "", a: "" }, true)),
     h("details", {}, h("summary", {}, "Más opciones"), ...more)
-  );
+  ];
 }
+
+/* =====================================================
+   PESTAÑA 2: IMÁGENES
+   ===================================================== */
+// Achica la imagen en el navegador (máx. 800 px) y la pasa a WEBP: carga rápido y pesa poco
+async function optimize(f) {
+  if (f.type === "image/gif") {
+    if (f.size > 3e6) throw new Error("el GIF pesa más de 3 MB");
+    return { blob: f, ext: ".gif" };   // los GIF animados se suben tal cual
+  }
+  if (!/^image\/(png|jpeg|webp)$/.test(f.type)) throw new Error("solo se aceptan PNG, JPG, WEBP o GIF");
+  const bmp = await createImageBitmap(f);
+  const k = Math.min(1, 800 / Math.max(bmp.width, bmp.height));
+  const c = document.createElement("canvas");
+  c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k);
+  c.getContext("2d").drawImage(bmp, 0, 0, c.width, c.height);   // conserva la transparencia
+  const blob = await new Promise(r => c.toBlob(r, "image/webp", 0.88));
+  if (!blob) throw new Error("no se pudo procesar");
+  return { blob, ext: blob.type === "image/webp" ? ".webp" : ".png" };
+}
+
+async function post(url, body, headers = {}) {
+  const isBlob = body instanceof Blob;
+  const r = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json", ...headers }, body: isBlob ? body : JSON.stringify(body) });
+  return r.json();
+}
+
+async function refreshImages() { images = await (await fetch("/api/images")).json(); }
+
+async function uploadFiles(files) {
+  const ok = [], bad = [];
+  say("Subiendo imágenes…", true);
+  for (const f of files) {
+    try {
+      const { blob, ext } = await optimize(f);
+      const base = f.name.replace(/\.[^.]+$/, "");
+      const r = await post("/api/upload", blob, { "x-filename": encodeURIComponent(base + ext), "Content-Type": blob.type });
+      if (r.ok) ok.push(r.name); else bad.push(f.name + ": " + r.msg);
+    } catch (e) { bad.push(f.name + ": " + e.message); }
+  }
+  await refreshImages(); render();
+  say((ok.length ? "Subidas: " + ok.join(", ") + ". Se publican cuando toques “Listo, publicar”." : "") +
+      (bad.length ? "\nNo se pudieron subir:\n" + bad.join("\n") : ""), !bad.length);
+}
+
+// ¿Dónde se usa una imagen?
+function usage(name) {
+  const u = [];
+  if (cfg.heroPoses.includes(name)) u.push("poses de la portada");
+  if (cfg.gallery.some(g => g[0] === name)) u.push("galería");
+  SLOTS.forEach(([k, label]) => { if (cfg.slots[k] === name) u.push(label); });
+  cfg.extras.forEach((e, i) => { if (e.image === name) u.push("bloque extra " + (i + 1)); });
+  return u;
+}
+
+async function delImage(name) {
+  const used = usage(name);
+  let msg = "¿Borrar " + name + " de la carpeta de imágenes?";
+  if (ORIGINAL[name]) msg += "\n\nOjo: esta imagen viene puesta en " + ORIGINAL[name] + ". Si no elegís otra en “Imagen de cada sección”, esa parte queda sin imagen.";
+  if (used.length) msg += "\n\nSe usa en: " + used.join(", ") + ". Se va a sacar de ahí.";
+  if (!confirm(msg)) return;
+  const r = await post("/api/delete-image", { name });
+  if (!r.ok) return say(r.msg, false);
+  // limpia todas las referencias a esa imagen
+  cfg.heroPoses = cfg.heroPoses.filter(x => x !== name);
+  cfg.gallery = cfg.gallery.filter(g => g[0] !== name);
+  Object.keys(cfg.slots).forEach(k => { if (cfg.slots[k] === name) delete cfg.slots[k]; });
+  cfg.extras.forEach(e => { if (e.image === name) e.image = ""; });
+  await refreshImages(); render();
+  say(r.msg + ". Se borra de la página cuando toques “Listo, publicar”.", true);
+}
+
+function viewImages() {
+  const file = h("input", { type: "file", accept: "image/png,image/jpeg,image/webp,image/gif", multiple: "multiple", style: "display:none" });
+  file.onchange = () => { if (file.files.length) uploadFiles([...file.files]); };
+  const drop = h("div", { class: "drop" }, "Arrastrá imágenes acá o ", h("button", { class: "add", onclick: () => file.click() }, "elegir archivos"),
+    h("div", { class: "note", style: "margin:8px 0 0" }, "PNG, JPG, WEBP o GIF. Se achican solas a 800 px y se pasan a WEBP (los GIF se suben tal cual)."), file);
+  drop.ondragover = e => { e.preventDefault(); drop.classList.add("over"); };
+  drop.ondragleave = () => drop.classList.remove("over");
+  drop.ondrop = e => { e.preventDefault(); drop.classList.remove("over"); uploadFiles([...e.dataTransfer.files]); };
+
+  const lib = h("section", {}, h("h2", {}, "Tu biblioteca de imágenes (" + images.length + ")"), drop,
+    h("div", { class: "tiles" }, ...images.map(i => h("div", { class: "tile" },
+      h("img", { src: "/images/" + i.name, alt: i.name }),
+      h("div", { class: "nm" }, i.name + " · " + Math.max(1, Math.round(i.size / 1024)) + " KB"),
+      ORIGINAL[i.name] ? h("div", { class: "badge" }, "viene en " + ORIGINAL[i.name]) : "",
+      h("button", { class: "x", title: "Borrar imagen", onclick: () => delImage(i.name) }, "✕")))));
+
+  // Poses de la portada: tocá para sumar/quitar; el número es el orden
+  const poses = h("section", {}, h("h2", {}, "Poses de Lyra en la portada"),
+    h("p", { class: "note" }, "Tocá las imágenes que querés que roten (el número es el orden). Sin ninguna, Lyra queda quieta."),
+    h("div", { class: "tiles" }, ...images.map(i => {
+      const idx = cfg.heroPoses.indexOf(i.name);
+      const t = h("div", { class: "tile pick" + (idx >= 0 ? " sel" : ""), onclick: () => {
+        const j = cfg.heroPoses.indexOf(i.name);
+        if (j >= 0) cfg.heroPoses.splice(j, 1); else cfg.heroPoses.push(i.name);
+        render();
+      } }, h("img", { src: "/images/" + i.name, alt: i.name }));
+      if (idx >= 0) t.append(h("div", { class: "ord" }, String(idx + 1)));
+      return t;
+    })));
+
+  // Imagen de cada sección
+  const slotRows = SLOTS.filter(([, , part]) => has(part)).map(([key, label]) =>
+    h("label", { class: "f" }, h("span", {}, label),
+      imgPicker(cfg.slots[key] || "", v => { if (v) cfg.slots[key] = v; else delete cfg.slots[key]; }, { blank: "(la original)", none: true })));
+  const slots = h("section", {}, h("h2", {}, "Imagen de cada sección"),
+    slotRows.length ? slotRows : h("p", { class: "note" }, "Tu página no tiene secciones con imagen fija."),
+    h("p", { class: "note" }, "¿Querés sumar imágenes nuevas en otro lugar? Usá la pestaña “Bloques extra”."));
+  return [lib, poses, slots];
+}
+
+/* =====================================================
+   PESTAÑA 3: TEXTOS
+   ===================================================== */
+function viewTexts() {
+  const fields = TEXTS.filter(([, , , part]) => !part || has(part))
+    .map(([key, label, def, , multi]) => text(label, cfg.texts, key, def, !!multi));
+  return [h("section", {}, h("h2", {}, "Textos de la página"),
+    h("p", { class: "note" }, "Dejá vacío para usar el texto original (lo ves en gris dentro de cada campo)."), ...fields)];
+}
+
+/* =====================================================
+   PESTAÑA 4: DISEÑO
+   ===================================================== */
+function colorRow(key, label, def) {
+  const c = h("input", { type: "color" });
+  c.value = cfg.theme[key] || def;
+  const rs = h("button", { class: "mini", title: "Volver al original" }, "↺");
+  const row = h("div", { class: "row colorrow" + (cfg.theme[key] ? " mod" : "") }, c, h("span", { class: "grow" }, label), rs);
+  c.oninput = () => { cfg.theme[key] = c.value; row.classList.add("mod"); };
+  rs.onclick = () => { delete cfg.theme[key]; c.value = def; row.classList.remove("mod"); };
+  return row;
+}
+
+// Selector de fuente con vista previa
+function fontPicker(label, key, def) {
+  const sel = h("select");
+  sel.append(h("option", { value: "" }, "(original: " + def + ")"));
+  FONTS.forEach(f => sel.append(h("option", { value: f }, f)));
+  sel.value = cfg.theme[key] || "";
+  const sample = h("div", { class: "sample" }, "Lyra Fest — ¡a bailar! 0123");
+  const preview = () => {
+    const f = sel.value || def;
+    if (!document.getElementById("pf-" + f)) {
+      const l = h("link", { id: "pf-" + f, rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=" + encodeURIComponent(f).replace(/%20/g, "+") + "&display=swap" });
+      document.head.append(l);
+    }
+    sample.style.fontFamily = '"' + f + '", sans-serif';
+  };
+  sel.onchange = () => { if (sel.value) cfg.theme[key] = sel.value; else delete cfg.theme[key]; preview(); };
+  preview();
+  return h("label", { class: "f" }, h("span", {}, label), sel, sample);
+}
+
+function switchRow(label, key) {
+  const c = h("input", { type: "checkbox" });
+  c.checked = cfg.theme[key] !== "off";
+  c.onchange = () => { if (c.checked) delete cfg.theme[key]; else cfg.theme[key] = "off"; };
+  return h("label", { class: "chk", style: "margin-bottom:8px" }, c, label);
+}
+
+function viewLook() {
+  const mode = h("select");
+  [["", "Automático (según el celu / compu de cada persona)"], ["dark", "Siempre oscuro"], ["light", "Siempre claro"]]
+    .forEach(([v, t]) => mode.append(h("option", { value: v }, t)));
+  mode.value = cfg.theme.mode || "";
+  mode.onchange = () => { if (mode.value) cfg.theme.mode = mode.value; else delete cfg.theme.mode; };
+
+  const css = h("textarea", { class: "code", placeholder: "/* Ejemplo:\n.btn { border-radius: 50px; }\nh1 { font-size: 5rem; } */", spellcheck: "false" });
+  css.value = cfg.customCss || "";
+  css.oninput = () => cfg.customCss = css.value;
+
+  return [
+    h("section", {}, h("h2", {}, "Colores"),
+      h("p", { class: "note" }, "Tocá un color para cambiarlo. Los que cambies quedan resaltados y se pueden volver al original con ↺. Pisan al modo claro/oscuro."),
+      ...COLORS.map(([k, l, d]) => colorRow(k, l, d))),
+    h("section", {}, h("h2", {}, "Tipografías"),
+      fontPicker("Títulos", "fontTitle", "Bungee"), fontPicker("Texto", "fontBody", "Fredoka")),
+    h("section", {}, h("h2", {}, "Estilo general"),
+      h("label", { class: "f" }, h("span", {}, "Modo"), mode),
+      switchRow("Cuadrícula de fondo", "grid"),
+      switchRow("Animaciones (Lyra flotando, cinta en movimiento)", "anim")),
+    h("details", {}, h("summary", {}, "CSS propio (avanzado)"),
+      h("p", { class: "note", style: "margin-top:10px" }, "Para quien sepa CSS: lo que escribas acá se aplica encima del diseño. Si algo se rompe, borrá el contenido."),
+      css),
+    h("section", {}, h("h2", {}, "Volver al diseño original"),
+      h("button", { class: "clear", onclick: () => {
+        if (confirm("Esto borra todos los colores, tipografías, ajustes de estilo y CSS propio. ¿Seguro?")) { cfg.theme = {}; cfg.customCss = ""; render(); }
+      } }, "Restaurar diseño original"))
+  ];
+}
+
+/* =====================================================
+   PESTAÑA 5: BLOQUES EXTRA
+   ===================================================== */
+function viewExtras() {
+  const box = h("div");
+  const draw = () => box.replaceChildren(
+    ...cfg.extras.map((b, i) => {
+      const where = h("select"); WHERE.forEach(([v, t]) => where.append(h("option", { value: v }, t)));
+      where.value = b.where || "end"; where.onchange = () => b.where = where.value;
+      const layout = h("select");
+      [["left", "Imagen a la izquierda"], ["right", "Imagen a la derecha"], ["top", "Imagen arriba (centrada)"]].forEach(([v, t]) => layout.append(h("option", { value: v }, t)));
+      layout.value = b.layout || "left"; layout.onchange = () => b.layout = layout.value;
+      const move = d => { const j = i + d; if (j < 0 || j >= cfg.extras.length) return; [cfg.extras[i], cfg.extras[j]] = [cfg.extras[j], cfg.extras[i]]; draw(); };
+      return h("div", { class: "block" },
+        h("div", { class: "top" }, where, layout,
+          h("button", { class: "mini", title: "Subir", onclick: () => move(-1) }, "↑"),
+          h("button", { class: "mini", title: "Bajar", onclick: () => move(1) }, "↓"),
+          h("button", { class: "x", title: "Borrar bloque", onclick: () => { cfg.extras.splice(i, 1); draw(); } }, "✕")),
+        text("Título (opcional)", b, "title"),
+        text("Texto (opcional)", b, "text", "", true),
+        h("label", { class: "f" }, h("span", {}, "Imagen (opcional, de tu biblioteca)"),
+          imgPicker(b.image || "", v => b.image = v, { blank: "(sin imagen)" })));
+    }),
+    h("button", { class: "add", onclick: () => { cfg.extras.push({ where: "end", layout: "left", title: "", text: "", image: "" }); draw(); } }, "+ agregar bloque")
+  );
+  draw();
+  return [h("section", {}, h("h2", {}, "Bloques extra"),
+    h("p", { class: "note" }, "Sumá una imagen, un título y/o un texto en el lugar que quieras. Para usar imágenes nuevas, subilas primero en la pestaña “Imágenes”. Si dos bloques van al mismo lugar, se respeta el orden de acá (↑ ↓)."),
+    box)];
+}
+
+/* ---------- Arma la pantalla según la pestaña ---------- */
+const VIEWS = { content: viewContent, images: viewImages, texts: viewTexts, look: viewLook, extras: viewExtras };
+const TAB_NAMES = [["content", "📝 Contenido"], ["images", "🖼️ Imágenes"], ["texts", "🔤 Textos"], ["look", "🎨 Diseño"], ["extras", "➕ Bloques extra"]];
+
+function render() {
+  $tabs.replaceChildren(...TAB_NAMES.map(([k, t]) =>
+    h("button", { class: k === tab ? "on" : "", onclick: () => { tab = k; render(); window.scrollTo(0, 0); } }, t)));
+  document.getElementById("app").replaceChildren(...VIEWS[tab]());
+}
+const $tabs = document.getElementById("tabs");
 
 /* ---------- Guardar / publicar ---------- */
 const status = document.getElementById("status");
@@ -220,8 +547,7 @@ async function send(url, label) {
   say(label, true);
   btnForce.hidden = true;
   try {
-    const r = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(cfg) });
-    const d = await r.json();
+    const d = await post(url, cfg);
     say(d.msg || "Listo", d.ok !== false);
     if (d.conflict) btnForce.hidden = false;   // ofrece pisar lo que hay en GitHub
   } catch (e) { say("No se pudo conectar con el editor. ¿Sigue abierta la ventana negra?", false); }
@@ -235,8 +561,18 @@ btnForce.onclick = () => {
 };
 
 /* ---------- Arranque ---------- */
-fetch("/api/config").then(r => r.json()).then(d => { cfg = d.cfg; parts = d.parts; render(); })
-  .catch(() => document.getElementById("app").textContent = "No se pudo leer js/config.js");
+fetch("/api/config").then(r => r.json()).then(d => {
+  cfg = d.cfg; parts = d.parts; images = d.images;
+  // Aseguramos que existan todas las listas y objetos
+  for (const k of ["info", "faq", "lineup", "barra", "heroSays", "hidden", "extras"]) cfg[k] = cfg[k] || [];
+  for (const k of ["texts", "theme", "slots"]) cfg[k] = cfg[k] || {};
+  cfg.links = cfg.links || {};
+  cfg.customCss = cfg.customCss || "";
+  // Los nombres viejos ("glow") pasan a "glow.webp"
+  cfg.heroPoses = (cfg.heroPoses || []).map(norm);
+  cfg.gallery = (cfg.gallery || []).map(([f, c]) => [norm(f), c]);
+  render();
+}).catch(() => document.getElementById("app").textContent = "No se pudo leer js/config.js");
 </script>
 </body>
 </html>

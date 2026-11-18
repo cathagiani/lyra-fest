@@ -2,33 +2,120 @@
    MAIN.JS — Lógica de la página (usa los datos de CONFIG)
    ===================================================== */
 
-// Atajo para buscar elementos por id
+// Atajos para buscar elementos
 const $ = id => document.getElementById(id);
-// Ruta de una imagen de Lyra a partir de su nombre
-const img = name => `images/${name}.webp`;
-// Partes ocultas desde el editor (lista de claves en CONFIG.hidden)
-const hidden = new Set(CONFIG.hidden || []);
+const $$ = sel => document.querySelectorAll(sel);
+// Ruta de una imagen: acepta "glow" (= glow.webp) o el nombre completo "mi-foto.png"
+const img = name => "images/" + (/\.[a-z0-9]+$/i.test(name) ? name : name + ".webp");
+
+// Datos que maneja el editor (todos opcionales)
+const hidden = new Set(CONFIG.hidden || []);   // partes ocultas
+const T = CONFIG.texts || {};                  // textos cambiados
+const THEME = CONFIG.theme || {};              // colores, fuentes, modo
+const SLOTS = CONFIG.slots || {};              // imágenes cambiadas por sección
+
+/* ---------- Tema: colores, modo, fuentes y CSS propio ---------- */
+(function applyTheme() {
+  const root = document.documentElement;
+  // Colores: pisan las variables de style.css
+  ["pink", "green", "cyan", "ink", "bg", "bg2", "card", "text", "muted", "h1"].forEach(k => {
+    if (THEME[k]) root.style.setProperty("--" + k, THEME[k]);
+  });
+  // La cuadrícula de fondo acompaña al color rosa
+  if (/^#[0-9a-f]{6}$/i.test(THEME.pink || "")) root.style.setProperty("--grid", THEME.pink + "22");
+  // Modo forzado, cuadrícula y animaciones (las reglas están en style.css)
+  if (THEME.mode === "dark" || THEME.mode === "light") root.dataset.mode = THEME.mode;
+  if (THEME.grid === "off") root.dataset.grid = "off";
+  if (THEME.anim === "off") root.dataset.anim = "off";
+
+  // Fuentes de Google (las dos originales ya vienen cargadas en el HTML)
+  const clean = n => String(n || "").replace(/["'<>\\;{}]/g, "").trim();
+  const fTitle = clean(THEME.fontTitle), fBody = clean(THEME.fontBody);
+  [fTitle, fBody].forEach(f => {
+    if (f && f !== "Bungee" && f !== "Fredoka") {
+      const l = document.createElement("link");
+      l.rel = "stylesheet";
+      l.href = "https://fonts.googleapis.com/css2?family=" + encodeURIComponent(f).replace(/%20/g, "+") + "&display=swap";
+      document.head.appendChild(l);
+    }
+  });
+  let css = "";
+  if (fTitle) css += `h1,h2,.ticker,.count b{font-family:"${fTitle}",Impact,sans-serif}\n`;
+  if (fBody) css += `body,.btn{font-family:"${fBody}",system-ui,sans-serif}\n`;
+  if (CONFIG.customCss) css += CONFIG.customCss;   // CSS propio (avanzado)
+  if (css) {
+    const st = document.createElement("style");
+    st.id = "lyra-custom";
+    st.textContent = css;
+    document.head.appendChild(st);   // va al final del <head>, así gana sobre style.css
+  }
+})();
 
 /* ---------- Textos simples ---------- */
 $("tagline").textContent = CONFIG.tagline;
 $("sub").textContent = CONFIG.sub;
 $("igFoot").href = CONFIG.links.instagram;
 
+// Pone un texto en un elemento (un salto de línea del editor = <br>)
+function setText(el, value) {
+  el.textContent = "";
+  value.split("\n").forEach((line, i) => {
+    if (i) el.append(document.createElement("br"));
+    el.append(line);
+  });
+}
+// clave del editor -> elemento de la página
+const TEXT_MAP = {
+  heroTitle: "h1", hintText: ".hint",
+  infoTitle: "#info h2", lineupTitle: "#lineup h2", barraTitle: "#barra h2",
+  lyraTitle: "#lyra h2", lyraSub: "#lyra .sub", faqTitle: "#faq h2",
+  joinTitle: ".join h2", joinText: ".join .sub"
+};
+Object.entries(TEXT_MAP).forEach(([key, sel]) => {
+  if (T[key]) $$(sel).forEach(el => setText(el, T[key]));
+});
+// Texto del pie (es un texto suelto dentro de <footer>)
+if (T.footerText) {
+  const f = document.querySelector("footer");
+  const node = f && [...f.childNodes].find(n => n.nodeType === 3 && n.nodeValue.trim());
+  if (node) node.nodeValue = "\n      " + T.footerText;
+}
+
+/* ---------- Imágenes cambiadas por sección ---------- */
+// clave del editor -> imagen(es) de la página
+const SLOT_MAP = {
+  lineup: "#lineup .split img", faq: "#faq .split img", join: ".join img", footer: "footer img",
+  barra1: "#barra .bar img:nth-of-type(1)", barra2: "#barra .bar img:nth-of-type(2)", barra3: "#barra .bar img:nth-of-type(3)"
+};
+Object.entries(SLOT_MAP).forEach(([key, sel]) => {
+  const v = SLOTS[key];
+  if (!v) return;   // vacío = se queda la original
+  $$(sel).forEach(el => { if (v === "none") el.style.display = "none"; else el.src = img(v); });
+});
+
 /* ---------- Cinta que se mueve ---------- */
-// Se repite el texto varias veces para que el loop no tenga cortes
-$("tick").textContent = "✦ LYRA FEST ✦ GLOWSTICKS ✦ NEÓN ✦ PISTA ✦ ".repeat(8);
+// Se repite el texto (en cantidad PAR) para que el loop no tenga cortes
+const tickBase = (T.tickerText || "✦ LYRA FEST ✦ GLOWSTICKS ✦ NEÓN ✦ PISTA ✦").trim() + " ";
+let reps = Math.max(2, Math.ceil(300 / tickBase.length));
+if (reps % 2) reps++;
+$("tick").textContent = tickBase.repeat(reps);
 
 /* ---------- Lyra interactiva de la portada ---------- */
+const POSES = (CONFIG.heroPoses || []).filter(Boolean);
+const SAYS = CONFIG.heroSays || [];
 // Precarga las poses para que no parpadee al cambiar
-CONFIG.heroPoses.forEach(p => { new Image().src = img(p); });
+POSES.forEach(p => { new Image().src = img(p); });
 
 let pose = 0;
 let timer;   // temporizador del cambio automático
 
 function showHero() {
-  $("hero").src = img(CONFIG.heroPoses[pose % CONFIG.heroPoses.length]);
-  // Frase al azar
-  $("bubble").textContent = CONFIG.heroSays[Math.floor(Math.random() * CONFIG.heroSays.length)];
+  if (POSES.length) $("hero").src = img(POSES[pose % POSES.length]);
+  const b = $("bubble");
+  if (b) {
+    b.textContent = SAYS.length ? SAYS[Math.floor(Math.random() * SAYS.length)] : "";   // frase al azar
+    b.style.visibility = SAYS.length ? "" : "hidden";
+  }
 }
 
 // Pasa a la siguiente pose y reinicia la cuenta de 5 segundos
@@ -54,9 +141,9 @@ function makeBtn(label, href, cls) {
 }
 // [clave para ocultar, texto, link, estilo]
 const BUTTONS = [
-  ["btnEntradas",  "🎟️ Entradas",         CONFIG.links.entradas,   ""],
-  ["btnWhatsapp",  "💬 Grupo de WhatsApp", CONFIG.links.whatsapp,   "alt"],
-  ["btnInstagram", "📸 Instagram",         CONFIG.links.instagram,  "alt2"]
+  ["btnEntradas",  T.btnEntradas  || "🎟️ Entradas",         CONFIG.links.entradas,  ""],
+  ["btnWhatsapp",  T.btnWhatsapp  || "💬 Grupo de WhatsApp", CONFIG.links.whatsapp,  "alt"],
+  ["btnInstagram", T.btnInstagram || "📸 Instagram",         CONFIG.links.instagram, "alt2"]
 ];
 // Se ponen los mismos botones arriba y abajo (saltea los que ocultaste)
 ["heroBtns", "bottomBtns"].forEach(id => {
@@ -76,7 +163,7 @@ function renderCards(list, boxId) {
     $(boxId).appendChild(card);
   });
 }
-renderCards(CONFIG.info, "infoGrid");
+renderCards(CONFIG.info || [], "infoGrid");
 renderCards(CONFIG.barra || [], "barGrid");   // si borraste la sección "La barra", no hace nada
 
 /* ---------- Line-up (solo si la sección existe en el HTML) ---------- */
@@ -89,7 +176,7 @@ if ($("lineupList")) {
 
 /* ---------- Preguntas frecuentes (desplegables) ---------- */
 if ($("faqList")) {   // solo si la sección existe
-  CONFIG.faq.forEach(f => {
+  (CONFIG.faq || []).forEach(f => {
     const d = document.createElement("details");
     const s = document.createElement("summary"); s.textContent = f.q;
     const p = document.createElement("p");       p.textContent = f.a;
@@ -110,6 +197,44 @@ if ($("gal")) {   // solo si la sección existe
     $("gal").appendChild(fig);
   });
 }
+
+/* ---------- Bloques extra (imagen y/o texto que armás desde el editor) ---------- */
+// where -> [elemento de referencia, "after" (después) o "before" (antes)]
+const ANCHORS = {
+  hero: ["header.hero", "after"], info: ["#info", "after"], lineup: ["#lineup", "after"],
+  barra: ["#barra", "after"], lyra: ["#lyra", "after"], faq: ["#faq", "after"],
+  join: [".join", "before"], end: ["footer", "before"]
+};
+const lastAt = {};   // último bloque puesto en cada lugar (para respetar el orden)
+function placeBlock(sec, where) {
+  const [sel, pos] = ANCHORS[where] || ANCHORS.end;
+  const ref = lastAt[where] || document.querySelector(sel);
+  if (ref) {
+    if (pos === "after" || lastAt[where]) ref.after(sec); else ref.before(sec);
+    lastAt[where] = sec;
+    return;
+  }
+  // Si esa sección no existe, va al final (antes del pie)
+  const f = document.querySelector("footer");
+  if (f) f.before(sec); else document.querySelector("main").append(sec);
+}
+(CONFIG.extras || []).forEach(x => {
+  if (!x.title && !x.text && !x.image) return;   // bloque vacío: se ignora
+  const sec = document.createElement("section");
+  sec.className = "extra " + (x.layout === "right" ? "right" : x.layout === "top" ? "top" : "left");
+  if (x.image) {
+    const im = document.createElement("img");
+    im.src = img(x.image); im.alt = x.title || ""; im.loading = "lazy";
+    sec.append(im);
+  }
+  if (x.title || x.text) {
+    const body = document.createElement("div"); body.className = "body";
+    if (x.title) { const h2 = document.createElement("h2"); h2.textContent = x.title; body.append(h2); }
+    if (x.text)  { const p = document.createElement("p");   p.textContent = x.text;  body.append(p); }
+    sec.append(body);
+  }
+  placeBlock(sec, x.where || "end");
+});
 
 /* ---------- Cuenta regresiva ---------- */
 const countEl = $("count");
@@ -140,5 +265,5 @@ const HIDEABLE = {
   faq: "#faq",         join: ".join",       footer: "footer"
 };
 hidden.forEach(key => {
-  if (HIDEABLE[key]) document.querySelectorAll(HIDEABLE[key]).forEach(el => el.style.display = "none");
+  if (HIDEABLE[key]) $$(HIDEABLE[key]).forEach(el => el.style.display = "none");
 });
