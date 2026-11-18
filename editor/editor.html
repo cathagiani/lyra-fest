@@ -533,8 +533,17 @@ const TAB_NAMES = [["content", "📝 Contenido"], ["images", "🖼️ Imágenes"
 function render() {
   $tabs.replaceChildren(...TAB_NAMES.map(([k, t]) =>
     h("button", { class: k === tab ? "on" : "", onclick: () => { tab = k; render(); window.scrollTo(0, 0); } }, t)));
-  document.getElementById("app").replaceChildren(...VIEWS[tab]());
+  try {
+    document.getElementById("app").replaceChildren(...VIEWS[tab]());
+  } catch (e) {
+    // Si una pestaña falla, lo muestra en pantalla (así se puede copiar y mandar)
+    document.getElementById("app").replaceChildren(h("section", {}, h("h2", {}, "Esta pestaña tuvo un error"),
+      h("p", { class: "note" }, "Sacale captura o copiá este texto y mandalo:"),
+      h("pre", { style: "white-space:pre-wrap;color:#ff8da1" }, String(e && e.stack || e))));
+  }
 }
+// Cualquier otro error de la página también se muestra abajo
+window.addEventListener("error", e => { try { say("Error: " + e.message + " (línea " + e.lineno + ")", false); } catch (_) {} });
 const $tabs = document.getElementById("tabs");
 
 /* ---------- Guardar / publicar ---------- */

@@ -93,7 +93,9 @@ const CONFIG = {
   extras: [],
 
   // Textos de la página (vacío = el original)
-  texts: {},
+  texts: {
+    "hintText": ""
+  },
 
   // Colores, tipografías y modo (vacío = el original)
   theme: {},
